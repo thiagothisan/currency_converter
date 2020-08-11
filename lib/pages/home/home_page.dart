@@ -16,8 +16,8 @@ class _HomePageState extends State<HomePage> {
   final dollarController = TextEditingController();
   final euroController = TextEditingController();
   final realController = TextEditingController();
-  double dollar;
-  double euro;
+  double dollar = 0.0;
+  double euro = 0.0;
 
   void _dollarChanged(String text) {
     if (text.isEmpty) {
@@ -58,7 +58,8 @@ class _HomePageState extends State<HomePage> {
 
   Future<Map> _getData() async {
     http.Response response = await http.get(request);
-    print(response.body);
+    print(json.decode(response.body));
+
     return json.decode(response.body);
   }
 
@@ -100,75 +101,91 @@ class _HomePageState extends State<HomePage> {
                   ),
                 );
               } else {
-                dollar = snapshot.data["results"]["currencies"]["USD"]["buy"];
-                euro = snapshot.data["results"]["currencies"]["EUR"]["buy"];
-                return Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: SingleChildScrollView(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: <Widget>[
-                        Image.asset(
-                          'assets/images/logo.png',
-                          height: 140,
-                          color: Colors.amber,
-                        ),
-                        Divider(),
-                        TextFieldWidget(
-                          label: "R\$ Reais",
-                          prefix: "R\$",
-                          controller: realController,
-                          function: _realChanged,
-                        ),
-                        Divider(),
-                        TextFieldWidget(
-                            label: "US\$ Dollars",
-                            prefix: "US\$",
-                            controller: dollarController,
-                            function: _dollarChanged),
-                        Divider(),
-                        TextFieldWidget(
-                          label: "€ Euros",
-                          prefix: "€",
-                          controller: euroController,
-                          function: _euroChanged,
-                        ),
-                        Divider(),
-                        Container(
-                          height: 60,
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              width: 0.7,
-                              color: Colors.amber,
-                            ),
-                          ),
-                          child: RaisedButton(
+                if (snapshot.data.containsKey("error")) {
+                  return Center(
+                      child: Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: Text(
+                      "${snapshot.data["message"]}",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ));
+                } else {
+                  dollar = snapshot.data["results"]["currencies"]["USD"]["buy"];
+                  euro = snapshot.data["results"]["currencies"]["EUR"]["buy"];
+
+                  return Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: <Widget>[
+                          Image.asset(
+                            'assets/images/logo.png',
+                            height: 140,
                             color: Colors.amber,
-                            highlightColor: Colors.transparent,
-                            elevation: 0,
-                            disabledElevation: 0,
-                            focusElevation: 0,
-                            highlightElevation: 0,
-                            hoverElevation: 0,
-                            splashColor: Colors.black,
-                            onPressed: () {
-                              _clearAll();
-                            },
-                            child: Text(
-                              "Clear",
-                              style: TextStyle(
-                                fontSize: 18,
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold,
+                          ),
+                          Divider(),
+                          TextFieldWidget(
+                            label: "R\$ Reais",
+                            prefix: "R\$",
+                            controller: realController,
+                            function: _realChanged,
+                          ),
+                          Divider(),
+                          TextFieldWidget(
+                              label: "US\$ Dollars",
+                              prefix: "US\$",
+                              controller: dollarController,
+                              function: _dollarChanged),
+                          Divider(),
+                          TextFieldWidget(
+                            label: "€ Euros",
+                            prefix: "€",
+                            controller: euroController,
+                            function: _euroChanged,
+                          ),
+                          Divider(),
+                          Container(
+                            height: 60,
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                width: 0.7,
+                                color: Colors.amber,
                               ),
                             ),
-                          ),
-                        )
-                      ],
+                            child: RaisedButton(
+                              color: Colors.amber,
+                              highlightColor: Colors.transparent,
+                              elevation: 0,
+                              disabledElevation: 0,
+                              focusElevation: 0,
+                              highlightElevation: 0,
+                              hoverElevation: 0,
+                              splashColor: Colors.black,
+                              onPressed: () {
+                                _clearAll();
+                              },
+                              child: Text(
+                                "Clear",
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
                     ),
-                  ),
-                );
+                  );
+                }
               }
           }
         },
